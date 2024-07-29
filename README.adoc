@@ -1,4 +1,5 @@
-
+(Look, this is just an experiment to see what will happen if I backport to Spring Boot 2.7.18. I don't know if it will work. It probably won't. But right now I can't use Spring 3.x and it really sucks. I'm
+also hacking a bunch of stuff out that I don't need. Basically, I only need jcache and Spring MVC).
 
 :url-repo: https://github.com/MarcGiffing/bucket4j-spring-boot-starter
 :url: https://github.com/MarcGiffing/bucket4j-spring-boot-starter/tree/master
