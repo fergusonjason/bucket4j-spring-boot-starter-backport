@@ -1,7 +1,7 @@
 package com.giffing.bucket4j.spring.boot.starter.config.filter.servlet.predicate;
 
 import com.giffing.bucket4j.spring.boot.starter.config.filter.predicate.PathExecutePredicate;
-import jakarta.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequest;
 
 public class ServletPathExecutePredicate extends PathExecutePredicate<HttpServletRequest>{
 

@@ -1,23 +1,24 @@
 package com.giffing.bucket4j.spring.boot.starter.filter.servlet;
 
-import com.giffing.bucket4j.spring.boot.starter.context.ExpressionParams;
-import com.giffing.bucket4j.spring.boot.starter.context.RateLimitCheck;
-import com.giffing.bucket4j.spring.boot.starter.context.RateLimitConditionMatchingStrategy;
-import com.giffing.bucket4j.spring.boot.starter.context.RateLimitResult;
-import com.giffing.bucket4j.spring.boot.starter.context.properties.FilterConfiguration;
-import com.giffing.bucket4j.spring.boot.starter.context.properties.RateLimit;
-import com.giffing.bucket4j.spring.boot.starter.service.RateLimitService;
-import jakarta.servlet.Filter;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.core.Ordered;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
+import com.giffing.bucket4j.spring.boot.starter.context.ExpressionParams;
+import com.giffing.bucket4j.spring.boot.starter.context.RateLimitConditionMatchingStrategy;
+import com.giffing.bucket4j.spring.boot.starter.context.RateLimitResult;
+import com.giffing.bucket4j.spring.boot.starter.context.properties.FilterConfiguration;
+import com.giffing.bucket4j.spring.boot.starter.service.RateLimitService;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Servlet {@link Filter} class to configure Bucket4j on each request.

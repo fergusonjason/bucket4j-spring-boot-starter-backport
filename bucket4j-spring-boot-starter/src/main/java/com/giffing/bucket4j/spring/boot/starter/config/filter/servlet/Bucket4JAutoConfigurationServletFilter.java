@@ -17,9 +17,9 @@ import com.giffing.bucket4j.spring.boot.starter.context.properties.Bucket4JBootP
 import com.giffing.bucket4j.spring.boot.starter.context.properties.Bucket4JConfiguration;
 import com.giffing.bucket4j.spring.boot.starter.filter.servlet.ServletRequestFilter;
 import com.giffing.bucket4j.spring.boot.starter.service.RateLimitService;
-import jakarta.servlet.Filter;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.Filter;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -84,7 +84,7 @@ public class Bucket4JAutoConfigurationServletFilter extends Bucket4JBaseConfigur
 		this.rateLimitService = rateLimitService;
 		this.servletConfigurationHolder =  servletConfigurationHolder;
 	}
-	
+
 	@Override
 	public void customize(ConfigurableServletWebServerFactory factory) {
 		var filterCount = new AtomicInteger(0);

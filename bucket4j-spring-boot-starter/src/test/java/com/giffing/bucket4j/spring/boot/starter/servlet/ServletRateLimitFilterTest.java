@@ -12,7 +12,7 @@ import java.util.Map;
 
 import com.giffing.bucket4j.spring.boot.starter.context.RateLimitResult;
 import com.giffing.bucket4j.spring.boot.starter.context.RateLimitResultWrapper;
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,9 +26,9 @@ import com.giffing.bucket4j.spring.boot.starter.context.RateLimitConditionMatchi
 import com.giffing.bucket4j.spring.boot.starter.context.properties.FilterConfiguration;
 import com.giffing.bucket4j.spring.boot.starter.filter.servlet.ServletRequestFilter;
 
-import jakarta.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequest;
 
-@ExtendWith(MockitoExtension.class) 
+@ExtendWith(MockitoExtension.class)
 class ServletRateLimitFilterTest {
 
 	private ServletRequestFilter filter;
@@ -37,53 +37,53 @@ class ServletRateLimitFilterTest {
 	@Mock private RateLimitCheck<HttpServletRequest> rateLimitCheck2;
 	@Mock private RateLimitCheck<HttpServletRequest> rateLimitCheck3;
 
-	
+
 	@Mock private RateLimitResultWrapper rateLimitResultWrapper;
 	@Mock private RateLimitResult rateLimitResult;
-	
+
 	@BeforeEach
     public void setup() {
 		when(rateLimitResult.isConsumed()).thenReturn(true);
 		when(rateLimitResultWrapper.getRateLimitResult()).thenReturn(rateLimitResult);
-        
+
         configuration = new FilterConfiguration<>();
         configuration.setRateLimitChecks(Arrays.asList(rateLimitCheck1, rateLimitCheck2, rateLimitCheck3));
         configuration.setUrl(".*");
         configuration.setHttpResponseHeaders(Map.of());
         filter = new ServletRequestFilter(configuration);
     }
-	
+
 	@Test
 	void should_execute_all_checks_when_using_RateLimitConditionMatchingStrategy_All() throws Exception {
-		
+
         when(rateLimitCheck1.rateLimit(any(), any())).thenReturn(rateLimitResultWrapper);
         when(rateLimitCheck2.rateLimit(any(), any())).thenReturn(rateLimitResultWrapper);
         when(rateLimitCheck3.rateLimit(any(), any())).thenReturn(rateLimitResultWrapper);
-        
+
         configuration.setStrategy(RateLimitConditionMatchingStrategy.ALL);
-        
+
         standaloneSetup(new TestController())
 			.addFilters(filter).build()
 			.perform(get(("/test")));
-        
+
         verify(rateLimitCheck1, times(1)).rateLimit(any(), any());
         verify(rateLimitCheck2, times(1)).rateLimit(any(), any());
         verify(rateLimitCheck3, times(1)).rateLimit(any(), any());
 	}
-	
+
 	@Test
 	void should_execute_first_check_when_using_RateLimitConditionMatchingStrategy_All_but_first_is_not_consumed() throws Exception {
-		
+
         when(rateLimitCheck1.rateLimit(any(), any())).thenReturn(rateLimitResultWrapper);
-        
+
         when(rateLimitResult.isConsumed()).thenReturn(false);
-        
+
         configuration.setStrategy(RateLimitConditionMatchingStrategy.ALL);
-        
+
         standaloneSetup(new TestController())
 			.addFilters(filter).build()
 			.perform(get(("/test")));
-        
+
         verify(rateLimitCheck1, times(1)).rateLimit(any(), any());
         verify(rateLimitCheck2, times(0)).rateLimit(any(), any());
         verify(rateLimitCheck3, times(0)).rateLimit(any(), any());
@@ -94,18 +94,18 @@ class ServletRateLimitFilterTest {
         configuration.setStrategy(RateLimitConditionMatchingStrategy.FIRST);
 
         when(rateLimitCheck1.rateLimit(any(), any())).thenReturn(rateLimitResultWrapper);
-        
+
         standaloneSetup(new TestController())
 			.addFilters(filter).build()
 			.perform(get(("/test")));
-        
-        
+
+
         verify(rateLimitCheck1, times(1)).rateLimit(any(), any());
         verify(rateLimitCheck2, times(0)).rateLimit(any(), any());
         verify(rateLimitCheck3, times(0)).rateLimit(any(), any());
 	}
-	
-	
+
+
 	@RestController
 	private static class TestController {
 
@@ -115,5 +115,5 @@ class ServletRateLimitFilterTest {
 		}
 
 	}
-	
+
 }

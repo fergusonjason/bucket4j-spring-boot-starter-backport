@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import jakarta.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintValidatorContext;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -21,8 +21,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 
-import com.giffing.bucket4j.spring.boot.starter.config.filter.reactive.predicate.WebfluxHeaderExecutePredicate;
-import com.giffing.bucket4j.spring.boot.starter.config.filter.reactive.predicate.WebfluxPathExecutePredicate;
 import com.giffing.bucket4j.spring.boot.starter.config.filter.servlet.predicate.ServletMethodPredicate;
 import com.giffing.bucket4j.spring.boot.starter.config.filter.servlet.predicate.ServletPathExecutePredicate;
 import com.giffing.bucket4j.spring.boot.starter.context.ExecutePredicate;
@@ -41,9 +39,7 @@ class ConfigPredicateNameValidatorTest {
     void setup() {
 		executePredicates = Arrays.asList(
 				//Servlet predicates
-				new ServletPathExecutePredicate(), new ServletMethodPredicate(),
-				//Webflux predicates
-				new WebfluxPathExecutePredicate(), new WebfluxHeaderExecutePredicate()
+				new ServletPathExecutePredicate(), new ServletMethodPredicate()
 		);
         validator = new Bucket4JConfigurationPredicateNameValidator(executePredicates);
     }
@@ -62,7 +58,7 @@ class ConfigPredicateNameValidatorTest {
      * Validate that SERVLET and WEBFLUX pass the test with a valid PATH execute-predicate
      */
     @ParameterizedTest
-    @EnumSource(value = FilterMethod.class, names = {"SERVLET", "WEBFLUX"})
+    @EnumSource(value = FilterMethod.class, names = {"SERVLET"})
     void testValidServletExecutePredicate(FilterMethod filterMethod) {
         List<String> executePredicates = List.of("PATH=valid-predicate");
         List<String> skipPredicates = List.of();
@@ -75,7 +71,7 @@ class ConfigPredicateNameValidatorTest {
      * Validate that SERVLET and WEBFLUX pass the test with a valid PATH skip-predicate
      */
     @ParameterizedTest
-    @EnumSource(value = FilterMethod.class, names = {"SERVLET", "WEBFLUX"})
+    @EnumSource(value = FilterMethod.class, names = {"SERVLET"})
     void testValidServletSkipPredicate(FilterMethod filterMethod) {
         List<String> executePredicates = List.of();
         List<String> skipPredicates = List.of("PATH=valid-predicate");
@@ -84,63 +80,6 @@ class ConfigPredicateNameValidatorTest {
         testValidPredicates(configuration);
     }
 
-    /**
-     * Validate that GATEWAY with predicates gives an error saying it's not supported
-     */
-    @Test
-    void testGatewayPredicateNotSupported() {
-        List<String> executePredicates = List.of();
-        List<String> skipPredicates = List.of("PATH=valid-predicate");
-        Bucket4JConfiguration configuration = setupConfiguration(FilterMethod.GATEWAY, executePredicates, skipPredicates);
-
-        testInvalidPredicates(configuration, "Predicates are not supported for Gateway filters");
-    }
-
-    /**
-     * Validate that multiple invalid predicates give a correct error message for both SERVLET and WEBFLUX
-     */
-    @ParameterizedTest
-    @EnumSource(value = FilterMethod.class, names = {"SERVLET", "WEBFLUX"})
-    void testMultipleInvalidWebfluxPredicates(FilterMethod filterMethod) {
-        List<String> executePredicates = List.of("INVALID_EXECUTE=invalid");
-        List<String> skipPredicates = List.of("INVALID_SKIP=invalid");
-        Bucket4JConfiguration configuration = setupConfiguration(filterMethod, executePredicates, skipPredicates);
-
-        List<String> expectedInvalid = List.of("INVALID_EXECUTE", "INVALID_SKIP");
-        testInvalidPredicates(configuration, getInvalidPredicateMessage(expectedInvalid));
-    }
-
-    /**
-     * Validate that the webflux predicates don't give false positives for servlet filters
-     */
-    @Test
-    void testInvalidServletWithWebfluxPredicate() {
-        List<String> executePredicates = List.of("PATH=both-methods");
-        List<String> skipPredicates = List.of("HEADER=webflux-only");
-        Bucket4JConfiguration servletConfiguration = setupConfiguration(FilterMethod.SERVLET, executePredicates, skipPredicates);
-        Bucket4JConfiguration webfluxConfiguration = setupConfiguration(FilterMethod.WEBFLUX, executePredicates, skipPredicates);
-
-        testValidPredicates(webfluxConfiguration);
-
-        List<String> expectedInvalid = List.of("HEADER");
-        testInvalidPredicates(servletConfiguration, getInvalidPredicateMessage(expectedInvalid));
-    }
-
-    /**
-     * Validate that the servlet predicates don't give false positives for webflux filters
-     */
-    @Test
-    void testInvalidWebfluxWithServletPredicate() {
-        List<String> executePredicates = List.of("PATH=both-methods");
-        List<String> skipPredicates = List.of("METHOD=servlet-only");
-        Bucket4JConfiguration servletConfiguration = setupConfiguration(FilterMethod.SERVLET, executePredicates, skipPredicates);
-        Bucket4JConfiguration webfluxConfiguration = setupConfiguration(FilterMethod.WEBFLUX, executePredicates, skipPredicates);
-
-        testValidPredicates(servletConfiguration);
-
-        List<String> expectedInvalid = List.of("METHOD");
-        testInvalidPredicates(webfluxConfiguration, getInvalidPredicateMessage(expectedInvalid));
-    }
 
     /**
      * Validate that custom predicates are supported

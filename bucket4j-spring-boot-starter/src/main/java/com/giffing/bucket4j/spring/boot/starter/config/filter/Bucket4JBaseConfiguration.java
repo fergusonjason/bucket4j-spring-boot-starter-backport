@@ -3,8 +3,6 @@ package com.giffing.bucket4j.spring.boot.starter.config.filter;
 import com.giffing.bucket4j.spring.boot.starter.config.cache.CacheManager;
 import com.giffing.bucket4j.spring.boot.starter.config.cache.CacheUpdateListener;
 import com.giffing.bucket4j.spring.boot.starter.config.cache.ProxyManagerWrapper;
-import com.giffing.bucket4j.spring.boot.starter.config.filter.reactive.gateway.Bucket4JAutoConfigurationSpringCloudGatewayFilter;
-import com.giffing.bucket4j.spring.boot.starter.config.filter.reactive.webflux.Bucket4JAutoConfigurationWebfluxFilter;
 import com.giffing.bucket4j.spring.boot.starter.config.filter.servlet.Bucket4JAutoConfigurationServletFilter;
 import com.giffing.bucket4j.spring.boot.starter.service.RateLimitService;
 import com.giffing.bucket4j.spring.boot.starter.context.*;
@@ -58,7 +56,7 @@ public abstract class Bucket4JBaseConfiguration<R, P> implements CacheUpdateList
         FilterConfiguration<R, P> filterConfig = mapFilterConfiguration(config);
         rateLimitConfigResult.getRateLimitChecks().forEach(filterConfig::addRateLimitCheck);
         rateLimitConfigResult.getPostRateLimitChecks().forEach(filterConfig::addPostRateLimitCheck);
-        
+
         return filterConfig;
     }
 
